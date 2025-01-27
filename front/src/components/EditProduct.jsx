@@ -1,0 +1,124 @@
+// Accion de editar un producto tanto en newQuotation como en OrderDetails
+import React, { useState, useEffect, useContext } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { UserContext } from "../contexts/UserContext";
+
+const EditProduct = () => {
+    const history = useHistory();
+    const location = useLocation();
+    const { product, orderId, returnPath, reopenModal } = location.state || {};
+    const { user } = useContext(UserContext); 
+    const [inputQuantity, setInputQuantity] = useState(product.quantity || "");
+    const [inputPrice, setInputPrice] = useState(product.price || "");
+    const [inputDescription, setInputDescription] = useState(product.description || "");
+    const [inputDate, setInputDate] = useState(product.date || "");
+    const [inputNumber, setInputNumber] = useState(product.number || "");
+    const [inputObservations, setInputObservations] = useState(product.observations || "");
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(product.category || "");
+
+    useEffect(() => {
+        axios.post('http://localhost/pruebaTwinpack/php/buscar_categorias.php')
+            .then((response) => {
+                setCategories(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching categories:", error);
+            });
+    }, []);
+
+    const handleCancel = () => {
+        history.push({
+            pathname: returnPath || "/dashboard",
+            state: { reopenModal, orderId }
+        });
+    };
+
+    const handleEditProduct = () => {
+        if (!inputQuantity || !inputPrice || !inputDescription || !inputDate || !inputNumber || !selectedCategory) {
+            toast.error("Por favor, complete todos los campos antes de editar el ítem.");
+            return;
+        }
+        const updatedProduct = {
+            id: product.id,
+            quantity: inputQuantity,
+            price: inputPrice,
+            description: inputDescription,
+            date: inputDate,
+            number: inputNumber,
+            category: selectedCategory,
+            observations: inputObservations,
+            user_id: user.id 
+        };
+        axios.post('http://localhost/pruebaTwinpack/php/editar_producto.php', new URLSearchParams(updatedProduct))
+            .then((response) => {
+                console.log("Respuesta del servidor:", response.data);
+                if (response.data === "Producto actualizado correctamente") {
+                    toast.success("Producto actualizado correctamente");
+                    history.push({
+                        pathname: returnPath || "/dashboard",
+                        state: { reopenModal, orderId }
+                    });
+                } else {
+                    toast.error("Error al actualizar el producto");
+                }
+            })
+            .catch((error) => {
+                console.error("Error al actualizar el producto:", error);
+                toast.error("Error al actualizar el producto");
+            });
+    };
+
+    return (
+        <section className="addproduct__section">
+            <div className="container-addproduct">
+                <h2 className="addproduct__title">Editar Producto</h2>
+                <form onSubmit={(e) => { e.preventDefault(); handleEditProduct(); }}>
+                <div className="div-cliente-addproduct">
+                    <label className="label_solicitud_addproduct">Categoría:</label>
+                        <select className="row_input" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                            <option value="">Seleccione una categoría</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.categoria}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="div-cliente-addproduct">
+                        <label className="label_solicitud_addproduct">Descripción:</label>
+                        <input className="row_input" type="text" value={inputDescription} onChange={(e) => setInputDescription(e.target.value)} />
+                    </div>
+                    <div className="div-cliente-addproduct">
+                        <label className="label_solicitud_addproduct">Cantidad:</label>
+                        <input className="row_input" type="number" value={inputQuantity} onChange={(e) => setInputQuantity(e.target.value)} />
+                    </div>
+                    <div className="div-cliente-addproduct">
+                        <label className="label_solicitud_addproduct">Precio:</label>
+                        <input className="row_input" type="number" value={inputPrice} onChange={(e) => setInputPrice(e.target.value)} />
+                    </div>    
+                    <div className="div-cliente-addproduct">
+                        <label className="label_solicitud_addproduct">Fecha:</label>
+                        <input className="row_input" type="date" value={inputDate} onChange={(e) => setInputDate(e.target.value)} />
+                    </div>
+                    <div className="div-cliente-addproduct">
+                        <label className="label_solicitud_addproduct">Número:</label>
+                        <input className="row_input" type="text" value={inputNumber} onChange={(e) => setInputNumber(e.target.value)} />
+                    </div>
+                    <div className="div-cliente-addproduct">
+                        <label className="label_solicitud_addproduct">Observaciones:</label>
+                        <textarea value={inputObservations} onChange={(e) => setInputObservations(e.target.value)} />
+                    </div>
+                    <div className="addProduct-button">
+                        <button className="addproduct__submit" type="submit">Editar Producto</button>
+                        <button className="addproduct__submit" type="button" onClick={handleCancel}>Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    );
+};
+
+export default EditProduct;
