@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/sistema_backup(27-01-2025)/static/css/main.608edbc2.css",
+    "main.js": "/sistema_backup(27-01-2025)/static/js/main.115432b6.js",
+    "static/media/bodega.jpg": "/sistema_backup(27-01-2025)/static/media/bodega.bc005451c22fbb50131f.jpg",
+    "static/media/etiqueta1.jpg": "/sistema_backup(27-01-2025)/static/media/etiqueta1.592bd2cd76835368c3a5.jpg",
+    "static/media/logo.jpg": "/sistema_backup(27-01-2025)/static/media/logo.1f72dd232beb5a0cfb37.jpg",
+    "index.html": "/sistema_backup(27-01-2025)/index.html",
+    "main.608edbc2.css.map": "/sistema_backup(27-01-2025)/static/css/main.608edbc2.css.map",
+    "main.115432b6.js.map": "/sistema_backup(27-01-2025)/static/js/main.115432b6.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.608edbc2.css",
+    "static/js/main.115432b6.js"
+  ]
+}
